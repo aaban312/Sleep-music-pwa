@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="پخش ترتیبی آهنگ و پادکست قبل از خواب با تایمر هوشمند">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>خواب آروم پیشرفته</title>
+  
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --font-size: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: linear-gradient(160deg, var(--bg), #1e293b);
+      color: var(--text);
+      font-family: Tahoma, 'Segoe UI', sans-serif;
+      font-size: var(--font-size);
+      min-height: 100vh;
+      padding: 12px;
+      padding-bottom: 40px;
+    }
+    .container {
+      max-width: 440px;
+      margin: 0 auto;
+      background: rgba(30,41,59,0.92);
+      border-radius: 20px;
+      padding: 18px 16px;
+      border: 1px solid rgba(148,163,184,0.2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+    h1 { text-align: center; color: var(--accent); font-size: 1.35rem; margin-bottom: 4px; }
+    .subtitle { text-align: center; color: var(--muted); font-size: 0.8rem; margin-bottom: 16px; }
+    
+    .section {
+      background: rgba(15,23,42,0.75);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(148,163,184,0.12);
+    }
+    .section-title { color: var(--accent); font-size: 0.95rem; margin-bottom: 10px; }
+    
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin: 6px 0 3px; }
+    input[type="file"], input[type="number"], select {
+      width: 100%;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    input[type="number"] { text-align: center; }
+    
+    .checkbox-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 0.85rem; }
+    .checkbox-row input { width: 17px; height: 17px; accent-color: var(--accent); }
+    
+    button {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    #startBtn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+    #stopBtn { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; display: none; }
+    
+    .controls { display: none; gap: 6px; margin-top: 10px; }
+    .controls.show { display: flex; }
+    .ctrl-btn {
+      flex: 1;
+      padding: 9px 4px;
+      font-size: 0.8rem;
+      background: #334155;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
+    
+    .progress-wrap {
+      margin-top: 14px;
+      height: 12px;
+      background: #0f172a;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #22d3ee);
+      transition: width 0.3s linear;
+    }
+    
+    .seek-row { margin-top: 10px; display: none; }
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      -webkit-appearance: none;
+      background: #0f172a;
+      border-radius: 4px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    
+    .status {
+      text-align: center;
+      margin-top: 14px;
+      padding: 11px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.8);
+      font-size: 0.9rem;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .status.active {
+      background: rgba(34,197,94,0.18);
+      color: #86efac;
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+    
+    .timer {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-align: center;
+      margin-top: 8px;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .duration { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+    .filename { font-size: 0.78rem; color: #7dd3fc; margin-top: 4px; word-break: break-all; }
+    
+    .settings-btn {
+      text-align: center;
+      margin: 12px 0 6px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    #settingsBox { display: none; }
+    #settingsBox.open { display: block; }
+    
+    .footer { text-align: center; font-size: 0.7rem; color: #64748b; margin-top: 16px; line-height: 1.5; }
+    audio { display: none; }
+    
+    .install-hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 10px;
+      padding: 8px;
+      background: rgba(15,23,42,0.5);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌙 خواب آروم پیشرفته</h1>
+    <p class="subtitle">یک تا سه آهنگ + نویز + فرکانس + محو شدن</p>
+
+    <!-- آهنگ ۱ -->
+    <div class="section">
+      <div class="section-title">🎵 آهنگ اول (ضروری)</div>
+      <input type="file" id="file1" accept="audio/*">
+      <div class="filename" id="name1"></div>
+      <div class="duration" id="dur1">مدت زمان: —</div>
+      <label>مدت پخش (دقیقه)</label>
+      <input type="number" id="min1" min="1" max="300" value="20">
+    </div>
+
+    <!-- آهنگ ۲ -->
+    <div class="section">
+      <div class="section-title">🎵 آهنگ دوم (اختیاری)</div>
+      <input type="file" id="file2" accept="audio/*">
+      <div class="filename" id="name2"></div>
+      <div class="duration" id="dur2">مدت زمان: —</div>
+      <label>مدت پخش (دقیقه) - ۰ = رد شود</label>
+      <input type="number" id="min2" min="0" max="300" value="30">
+    </div>
+
+    <!-- آهنگ ۳ -->
+    <div class="section">
+      <div class="section-title">🎵 آهنگ سوم (اختیاری)</div>
+      <input type="file" id="file3" accept="audio/*">
+      <div class="filename" id="name3"></div>
+      <div class="duration" id="dur3">مدت زمان: —</div>
+      <label>مدت پخش (دقیقه) - ۰ = رد شود</label>
+      <input type="number" id="min3" min="0" max="300" value="0">
+    </div>
+
+    <!-- تنظیمات اصلی -->
+    <div class="section">
+      <div class="section-title">🌊 پس‌زمینه و تنظیمات</div>
+      
+      <label>آهنگ پس‌زمینه (لوپ در کل مدت)</label>
+      <input type="file" id="fileBG" accept="audio/*">
+      <div class="filename" id="nameBG"></div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="chkNoise">
+        <label for="chkNoise" style="margin:0">صدای سفید نرم</label>
+      </div>
+      
+      <div class="checkbox-row">
+        <input type="checkbox" id="chkFade" checked>
+        <label for="chkFade" style="margin:0">محو شدن صدا</label>
+      </div>
+      
+      <label>مدت محو شدن (ثانیه)</label>
+      <input type="number" id="fadeSec" min="3" max="60" value="10">
+      
+      <label>فرکانس بک‌گراند (Hz) - ۰ = خاموش</label>
+      <input type="number" id="freq" min="0" max="800" value="0" placeholder="مثلا ۴۰ یا ۱۷۴">
+      
+      <label>سرعت پخش (قابل تغییر حتی حین پخش)</label>
+      <select id="speed">
+        <option value="0.5">۰.۵x</option>
+        <option value="0.75">۰.۷۵x</option>
+        <option value="1" selected>۱x</option>
+        <option value="1.25">۱.۲۵x</option>
+        <option value="1.5">۱.۵x</option>
+        <option value="1.75">۱.۷۵x</option>
+        <option value="2">۲x</option>
+        <option value="2.25">۲.۲۵x</option>
+        <option value="2.5">۲.۵x</option>
+        <option value="2.75">۲.۷۵x</option>
+        <option value="3">۳x</option>
+      </select>
+    </div>
+
+    <div class="settings-btn" id="btnSettings">⚙️ تنظیمات ظاهر (رنگ و فونت)</div>
+    
+    <div id="settingsBox">
+      <div class="section">
+        <label>رنگ پس‌زمینه</label>
+        <input type="color" id="cBg" value="#0f172a" style="width:100%;height:42px;padding:0;border:none;">
+        <label>رنگ کارت‌ها</label>
+        <input type="color" id="cCard" value="#1e293b" style="width:100%;height:42px;padding:0;border:none;">
+        <label>رنگ تأکید</label>
+        <input type="color" id="cAccent" value="#38bdf8" style="width:100%;height:42px;padding:0;border:none;">
+        <label>اندازه فونت (px)</label>
+        <input type="number" id="fSize" min="13" max="20" value="16">
+      </div>
+    </div>
+
+    <button id="startBtn">▶ شروع خواب</button>
+    <button id="stopBtn">⏹ توقف کامل</button>
+
+    <div class="controls" id="controls">
+      <button class="ctrl-btn" id="b30">⏪ ۳۰ث</button>
+      <button class="ctrl-btn" id="b10">⏪ ۱۰ث</button>
+      <button class="ctrl-btn" id="f10">۱۰ث ⏩</button>
+      <button class="ctrl-btn" id="f30">۳۰ث ⏩</button>
+    </div>
+
+    <div class="seek-row" id="seekRow">
+      <input type="range" id="seek" min="0" max="100" value="0">
+    </div>
+
+    <div class="status" id="status">حداقل یک آهنگ انتخاب کن و شروع کن</div>
+    <div class="timer" id="timer">۰۰:۰۰</div>
+    
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <div class="install-hint" id="installHint">
+      برای نصب: منوی مرورگر → Add to Home screen / Install app
+    </div>
+
+    <div class="footer">
+      تنظیمات و نام آخرین فایل‌ها ذخیره می‌شود<br>
+      اگر آهنگ زودتر تمام شود، بلافاصله بعدی شروع می‌شود
+    </div>
+  </div>
+
+  <audio id="p1"></audio>
+  <audio id="p2"></audio>
+  <audio id="p3"></audio>
+  <audio id="pBG" loop></audio>
+
+  <script>
+    // ===== ثبت Service Worker برای PWA =====
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW registered', reg.scope))
+          .catch(err => console.log('SW failed', err));
+      });
+    }
+
+    // ===== عناصر =====
+    const file1 = document.getElementById('file1');
+    const file2 = document.getElementById('file2');
+    const file3 = document.getElementById('file3');
+    const fileBG = document.getElementById('fileBG');
+    const p1 = document.getElementById('p1');
+    const p2 = document.getElementById('p2');
+    const p3 = document.getElementById('p3');
+    const pBG = document.getElementById('pBG');
+    
+    const min1 = document.getElementById('min1');
+    const min2 = document.getElementById('min2');
+    const min3 = document.getElementById('min3');
+    
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+    const timerEl = document.getElementById('timer');
+    const progress = document.getElementById('progress');
+    const controls = document.getElementById('controls');
+    const seekRow = document.getElementById('seekRow');
+    const seek = document.getElementById('seek');
+    const speedSelect = document.getElementById('speed');
+    
+    let phase = 0;
+    let remaining = 0;
+    let total = 0;
+    let interval = null;
+    let fadeInterval = null;
+    let current = null;
+    let audioCtx = null;
+    let oscillator = null;
+    let noiseNode = null;
+
+    // ===== نمایش مدت و نام فایل =====
+    function bindFile(fileInput, nameEl, durEl, audioEl, key) {
+      fileInput.addEventListener('change', function() {
+        if (!this.files[0]) {
+          nameEl.textContent = '';
+          durEl.textContent = 'مدت زمان: —';
+          audioEl.removeAttribute('src');
+          saveMeta();
+          return;
+        }
+        const file = this.files[0];
+        nameEl.textContent = '📁 ' + file.name;
+        audioEl.src = URL.createObjectURL(file);
+        audioEl.onloadedmetadata = function() {
+          const d = Math.floor(audioEl.duration);
+          const m = Math.floor(d / 60);
+          const s = d % 60;
+          durEl.textContent = 'مدت زمان: ' + m + ':' + (s < 10 ? '0' : '') + s;
+          saveMeta();
+        };
+      });
+    }
+    bindFile(file1, document.getElementById('name1'), document.getElementById('dur1'), p1, 'f1');
+    bindFile(file2, document.getElementById('name2'), document.getElementById('dur2'), p2, 'f2');
+    bindFile(file3, document.getElementById('name3'), document.getElementById('dur3'), p3, 'f3');
+    fileBG.addEventListener('change', function() {
+      if (this.files[0]) {
+        document.getElementById('nameBG').textContent = '📁 ' + this.files[0].name;
+        pBG.src = URL.createObjectURL(this.files[0]);
+      } else {
+        document.getElementById('nameBG').textContent = '';
+        pBG.removeAttribute('src');
+      }
+      saveMeta();
+    });
+
+    function format(sec) {
+      sec = Math.max(0, Math.floor(sec));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function updateUI() {
+      timerEl.textContent = format(remaining);
+      if (total > 0) {
+        progress.style.width = ((total - remaining) / total * 100) + '%';
+      } else {
+        progress.style.width = '0%';
+      }
+      if (current && current.duration && !isNaN(current.duration)) {
+        seek.max = current.duration;
+        seek.value = current.currentTime;
+      }
+    }
+
+    function applySpeed() {
+      const rate = parseFloat(speedSelect.value) || 1;
+      if (p1.src) p1.playbackRate = rate;
+      if (p2.src) p2.playbackRate = rate;
+      if (p3.src) p3.playbackRate = rate;
+      if (pBG.src) pBG.playbackRate = rate;
+    }
+
+    // تغییر سرعت حتی حین پخش
+    speedSelect.addEventListener('change', function() {
+      applySpeed();
+      saveMeta();
+    });
+
+    function startFade(player) {
+      clearInterval(fadeInterval);
+      let vol = 1;
+      const steps = parseInt(document.getElementById('fadeSec').value) || 10;
+      fadeInterval = setInterval(function() {
+        vol -= 1 / steps;
+        if (vol <= 0) {
+          player.volume = 0;
+          clearInterval(fadeInterval);
+        } else {
+          player.volume = Math.max(0, vol);
+        }
+      }, 1000);
+    }
+
+    function stopAllAudio() {
+      p1.pause(); p2.pause(); p3.pause(); pBG.pause();
+      try { if (oscillator) oscillator.stop(); } catch(e){}
+      oscillator = null;
+      try { if (noiseNode) noiseNode.stop(); } catch(e){}
+      noiseNode = null;
+      try { if (audioCtx) audioCtx.close(); } catch(e){}
+      audioCtx = null;
+    }
+
+    function startNoise() {
+      stopAllAudio();
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const bufferSize = audioCtx.sampleRate * 2;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+      noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = buffer;
+      noiseNode.loop = true;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.06;
+      noiseNode.connect(gain);
+      gain.connect(audioCtx.destination);
+      noiseNode.start();
+    }
+
+    function startTone(hz) {
+      if (hz <= 0) return;
+      stopAllAudio();
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      oscillator = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = hz;
+      gain.gain.value = 0.035;
+      oscillator.connect(gain);
+      gain.connect(audioCtx.destination);
+      oscillator.start();
+    }
+
+    function startPhase(n) {
+      clearInterval(interval);
+      clearInterval(fadeInterval);
+
+      // توقف قبلی‌ها
+      p1.pause(); p2.pause(); p3.pause();
+
+      phase = n;
+      let player, mins;
+
+      if (n === 1) { player = p1; mins = parseInt(min1.value) || 20; }
+      else if (n === 2) { player = p2; mins = parseInt(min2.value) || 0; }
+      else if (n === 3) { player = p3; mins = parseInt(min3.value) || 0; }
+      else { finish(); return; }
+
+      // اگر فایل یا دقیقه نداریم، برو بعدی
+      if (mins <= 0 || !player.src) {
+        startPhase(n + 1);
+        return;
+      }
+
+      current = player;
+      remaining = mins * 60;
+      total = remaining;
+
+      player.currentTime = 0;
+      player.volume = 1;
+      applySpeed();
+      player.play().catch(function(err) {
+        console.error(err);
+        alert('خطا در پخش آهنگ ' + n + '. مطمئن شو فایل صوتی معتبر انتخاب کردی.');
+      });
+
+      // پس‌زمینه
+      if (pBG.src) {
+        pBG.volume = 0.28;
+        applySpeed();
+        pBG.play().catch(function(){});
+      }
+
+      // نویز یا فرکانس
+      if (document.getElementById('chkNoise').checked) {
+        startNoise();
+      } else {
+        const f = parseFloat(document.getElementById('freq').value);
+        if (f > 0) startTone(f);
+      }
+
+      status.classList.add('active');
+      status.textContent = 'در حال پخش آهنگ ' + n + ' (' + mins + ' دقیقه)';
+      controls.classList.add('show');
+      seekRow.style.display = 'block';
+      updateUI();
+
+      interval = setInterval(function() {
+        remaining--;
+        if (remaining === parseInt(document.getElementById('fadeSec').value) && document.getElementById('chkFade').checked) {
+          startFade(player);
+        }
+        updateUI();
+        if (remaining <= 0) {
+          startPhase(n + 1);
+        }
+      }, 1000);
+
+      player.onended = function() {
+        if (phase === n) {
+          clearInterval(interval);
+          startPhase(n + 1);
+        }
+      };
+
+      saveMeta();
+    }
+
+    function finish() {
+      clearInterval(interval);
+      clearInterval(fadeInterval);
+      stopAllAudio();
+      phase = 0;
+      current = null;
+      remaining = 0;
+      total = 0;
+      updateUI();
+      status.classList.remove('active');
+      status.textContent = 'خوابت آروم باشه 🌙';
+      startBtn.style.display = 'block';
+      stopBtn.style.display = 'none';
+      controls.classList.remove('show');
+      seekRow.style.display = 'none';
+      saveMeta();
+    }
+
+    // ===== دکمه‌ها =====
+    startBtn.onclick = function() {
+      // فقط آهنگ اول اجباری است
+      if (!p1.src) {
+        alert('حداقل آهنگ اول را انتخاب کن');
+        return;
+      }
+      startBtn.style.display = 'none';
+      stopBtn.style.display = 'block';
+      startPhase(1);
+    };
+
+    stopBtn.onclick = finish;
+
+    document.getElementById('b30').onclick = function() { if (current) current.currentTime = Math.max(0, current.currentTime - 30); };
+    document.getElementById('b10').onclick = function() { if (current) current.currentTime = Math.max(0, current.currentTime - 10); };
+    document.getElementById('f10').onclick = function() { if (current) current.currentTime = Math.min(current.duration || 9999, current.currentTime + 10); };
+    document.getElementById('f30').onclick = function() { if (current) current.currentTime = Math.min(current.duration || 9999, current.currentTime + 30); };
+
+    seek.oninput = function() {
+      if (current) current.currentTime = parseFloat(seek.value);
+    };
+
+    setInterval(function() {
+      if (current && !current.paused && current.duration) {
+        seek.value = current.currentTime;
+      }
+    }, 400);
+
+    // ===== تنظیمات ظاهر =====
+    document.getElementById('btnSettings').onclick = function() {
+      document.getElementById('settingsBox').classList.toggle('open');
+    };
+
+    document.getElementById('cBg').oninput = function() {
+      document.documentElement.style.setProperty('--bg', this.value);
+      saveMeta();
+    };
+    document.getElementById('cCard').oninput = function() {
+      document.documentElement.style.setProperty('--card', this.value);
+      saveMeta();
+    };
+    document.getElementById('cAccent').oninput = function() {
+      document.documentElement.style.setProperty('--accent', this.value);
+      saveMeta();
+    };
+    document.getElementById('fSize').oninput = function() {
+      document.documentElement.style.setProperty('--font-size', this.value + 'px');
+      saveMeta();
+    };
+
+    // ===== ذخیره متادیتا (نام فایل‌ها + تنظیمات) =====
+    // توجه: خود فایل‌های صوتی به خاطر محدودیت امنیتی مرورگر قابل ذخیره‌سازی خودکار نیستند.
+    // نام فایل‌ها و همه تنظیمات ذخیره می‌شوند تا یادآوری شود چه چیزی انتخاب کرده بودی.
+    function saveMeta() {
+      const data = {
+        min1: min1.value,
+        min2: min2.value,
+        min3: min3.value,
+        fadeSec: document.getElementById('fadeSec').value,
+        freq: document.getElementById('freq').value,
+        speed: speedSelect.value,
+        noise: document.getElementById('chkNoise').checked,
+        fade: document.getElementById('chkFade').checked,
+        cBg: document.getElementById('cBg').value,
+        cCard: document.getElementById('cCard').value,
+        cAccent: document.getElementById('cAccent').value,
+        fSize: document.getElementById('fSize').value,
+        name1: document.getElementById('name1').textContent,
+        name2: document.getElementById('name2').textContent,
+        name3: document.getElementById('name3').textContent,
+        nameBG: document.getElementById('nameBG').textContent,
+        dur1: document.getElementById('dur1').textContent,
+        dur2: document.getElementById('dur2').textContent,
+        dur3: document.getElementById('dur3').textContent
+      };
+      try {
+        localStorage.setItem('sleepAppV3', JSON.stringify(data));
+      } catch(e) {}
+    }
+
+    function loadMeta() {
+      try {
+        const d = JSON.parse(localStorage.getItem('sleepAppV3') || '{}');
+        if (d.min1) min1.value = d.min1;
+        if (d.min2) min2.value = d.min2;
+        if (d.min3) min3.value = d.min3;
+        if (d.fadeSec) document.getElementById('fadeSec').value = d.fadeSec;
+        if (d.freq) document.getElementById('freq').value = d.freq;
+        if (d.speed) speedSelect.value = d.speed;
+        if (d.noise) document.getElementById('chkNoise').checked = d.noise;
+        if (d.fade !== undefined) document.getElementById('chkFade').checked = d.fade;
+        if (d.cBg) {
+          document.getElementById('cBg').value = d.cBg;
+          document.documentElement.style.setProperty('--bg', d.cBg);
+        }
+        if (d.cCard) {
+          document.getElementById('cCard').value = d.cCard;
+          document.documentElement.style.setProperty('--card', d.cCard);
+        }
+        if (d.cAccent) {
+          document.getElementById('cAccent').value = d.cAccent;
+          document.documentElement.style.setProperty('--accent', d.cAccent);
+        }
+        if (d.fSize) {
+          document.getElementById('fSize').value = d.fSize;
+          document.documentElement.style.setProperty('--font-size', d.fSize + 'px');
+        }
+        // نمایش نام آخرین فایل‌ها (یادآوری)
+        if (d.name1) document.getElementById('name1').textContent = d.name1;
+        if (d.name2) document.getElementById('name2').textContent = d.name2;
+        if (d.name3) document.getElementById('name3').textContent = d.name3;
+        if (d.nameBG) document.getElementById('nameBG').textContent = d.nameBG;
+        if (d.dur1) document.getElementById('dur1').textContent = d.dur1;
+        if (d.dur2) document.getElementById('dur2').textContent = d.dur2;
+        if (d.dur3) document.getElementById('dur3').textContent = d.dur3;
+      } catch(e) {}
+    }
+
+    // ذخیره هنگام تغییر تنظیمات
+    [min1, min2, min3, document.getElementById('fadeSec'), document.getElementById('freq'),
+     document.getElementById('chkNoise'), document.getElementById('chkFade')].forEach(function(el) {
+      el.addEventListener('change', saveMeta);
+    });
+
+    loadMeta();
+  </script>
+</body>
+</html>
