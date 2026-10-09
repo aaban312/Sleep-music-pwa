@@ -1,45 +1,19 @@
-# 🌙 خواب آروم پیشرفته (Sleep Dual Timer PWA)
+Sleep Dual Timer is a lightweight Progressive Web App designed for peaceful bedtime listening.
 
-یک Progressive Web App ساده و قدرتمند برای پخش ترتیبی ۱ تا ۳ آهنگ/پادکست قبل از خواب.
+Play one to three podcasts or songs in sequence. Each track has its own timer. If a track ends early, the next one starts immediately — no waiting, no gap. 
 
-## قابلیت‌ها
+You can add a looping background track, enable soft white noise, or play a custom frequency (Hz). Volume gently fades out at the end of each phase. Playback speed can be changed anytime, even while the audio is playing.
 
-- پخش ۱ تا ۳ آهنگ پشت‌سرهم با تایمر جداگانه برای هر کدام
-- اگر آهنگ زودتر تمام شود، بلافاصله به آهنگ بعدی می‌رود (بدون مکث)
-- آهنگ پس‌زمینه (لوپ در کل مدت)
-- صدای سفید نرم داخلی
-- فرکانس دلخواه (Hz) در بک‌گراند
-- محو شدن صدا (Fade Out) با مدت قابل تنظیم
-- کنترل سرعت پخش از ۰.۵x تا ۳x (حتی حین پخش)
-- عقب/جلو کردن (±۱۰ و ±۳۰ ثانیه) + نوار پیشرفت
-- تنظیمات ظاهر (رنگ‌ها و اندازه فونت)
-- ذخیره تنظیمات و نام آخرین فایل‌ها در localStorage
-- قابل نصب روی گوشی (Add to Home Screen)
-- کار آفلاین بعد از اولین بارگذاری
+All settings and the names of the last selected files are saved automatically. The app works offline after the first load and can be installed on your phone like a native app.
 
-## نحوه استفاده
-
-1. فایل‌ها را در یک سرور استاتیک (GitHub Pages، Netlify، Vercel و ...) آپلود کنید.
-2. یا به صورت محلی با یک سرور ساده باز کنید (مثلاً `npx serve .`).
-3. در مرورگر موبایل: منوی سه‌نقطه → **Add to Home screen** یا **Install app**.
-
-## ساختار فایل‌ها
-
-```
-sleep-pwa/
-├── index.html          # اپ اصلی
-├── manifest.json       # مانیفست PWA
-├── sw.js               # Service Worker (آفلاین)
-├── icons/              # آیکون‌های مختلف سایز
-│   ├── icon-72.png
-│   ├── icon-96.png
-│   ├── ...
-│   └── icon-512.png
-└── README.md
-```
-
-## نکات مهم
-
-- به دلیل محدودیت امنیتی مرورگر، خود فایل‌های صوتی قابل ذخیره‌سازی خودکار نیستند. نام فایل‌ها و همه تنظیمات ذخیره می‌شوند تا یادآوری شود.
-- برای بهترین تجربه، از Chrome یا Edge روی اندروید استفاده کنید.
-- HTTPS برای نصب PWA و Service Worker الزامی است (GitHub Pages این را فراهم می‌کند).
+- Play 1 to 3 tracks in sequence with individual timers
+- Instant switch to the next track if the current one ends early
+- Optional looping background track
+- Built-in soft white noise
+- Custom background frequency (Hz)
+- Adjustable fade-out duration
+- Live playback speed control (0.5x – 3x) even during playback
+- Seek controls (±10s / ±30s) + progress bar
+- Appearance settings (colors & font size)
+- Remembers last settings and file names
+- Fully installable PWA with offline support
