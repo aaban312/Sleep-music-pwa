@@ -1,3 +1,4 @@
+A simple Progressive Web App that plays 1–3 audio tracks in sequence before sleep, with individual timers, fade-out, white noise, background frequency, and live speed control.
 Sleep Dual Timer is a lightweight Progressive Web App designed for peaceful bedtime listening.
 
 Play one to three podcasts or songs in sequence. Each track has its own timer. If a track ends early, the next one starts immediately — no waiting, no gap. 
